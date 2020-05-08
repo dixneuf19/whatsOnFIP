@@ -1,5 +1,6 @@
 import os
 import logging
+from typing import List
 
 from dotenv import load_dotenv
 
@@ -14,6 +15,10 @@ load_dotenv()
 API_TOKEN = os.getenv("RADIO_FRANCE_API_TOKEN")
 
 RADIO_FRANCE_API = "https://openapi.radiofrance.fr/v1/graphql"
+
+
+class LiveUnavailableException(Exception):
+    pass
 
 
 def track_to_song(track) -> Song:
@@ -52,7 +57,9 @@ class APIClient(Client):
         except:
             raise
 
-    def execute_grid_query(self, start: int, end: int, station: str = "FIP"):
+    def execute_grid_query(
+        self, start: int, end: int, station: str = "FIP"
+    ) -> List[Song]:
         logging.info(f"Querying the GraphQL API for {station} from {start} to {end}")
         query = gql(
             f"""{{ 
@@ -74,3 +81,28 @@ class APIClient(Client):
             return [track_to_song(t) for t in tracks["grid"]]
         except:
             raise
+
+    def execute_live_query(self, station: str = "FIP") -> Song:
+        logging.info(f"Querying the GraphQL API for {station} from live")
+        query = gql(
+            f"""{{
+                live(station: {station}) {{
+                    song {{
+                        id
+                        track {{
+                            title
+                            albumTitle
+                            mainArtists
+                            productionDate
+                        }}
+                    }}
+                }}
+            }}
+            """
+        )
+        res = super().execute(query)
+        if res["live"]["song"] is None:
+            raise LiveUnavailableException(
+                f"invalid result for live {station} query : {res}"
+            )
+        return track_to_song(res["live"]["song"])
