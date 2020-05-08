@@ -11,7 +11,7 @@ build:
 	docker build -t $(DOCKER_IMAGE_PATH) .
 
 run:
-	docker run -p 8000:8000 --env-file=.env $(DOCKER_IMAGE_PATH)
+	docker run -p 8000:80 --env-file=.env $(DOCKER_IMAGE_PATH)
 
 push:
 	docker push $(DOCKER_IMAGE_PATH)
