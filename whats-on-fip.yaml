@@ -19,7 +19,7 @@ spec:
               secretKeyRef:
                 key: api-token
                 name: radio-france-api-token
-        image: dixneuf19/whatsonfip:arm
+        image: dixneuf19/whatsonfip:latest
         resources:
           limits:
             memory: "128Mi"
