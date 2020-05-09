@@ -13,12 +13,9 @@ spec:
     spec:
       containers:
       - name: whats-on-fip
-        env:
-        - name: RADIO_FRANCE_API_TOKEN
-          valueFrom:
-              secretKeyRef:
-                key: api-token
-                name: radio-france-api-token
+        envFrom:
+        - secretRef:
+            name: radio-france-api-token
         image: dixneuf19/whatsonfip:latest
         resources:
           limits:
