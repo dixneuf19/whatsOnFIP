@@ -1,0 +1,39 @@
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+container:
+  replicaCount: 1
+
+  image:
+    repository: dixneuf19/whatsonfip
+    tag: latest
+    pullPolicy: Always
+
+  port: 80
+
+  resources:
+    limits:
+      memory: '128Mi'
+      cpu: '300m'
+    requests:
+      memory: '64Mi'
+      cpu: '100m'
+
+  probe:
+    path: /health
+
+service:
+  type: ClusterIP
+  port: 1919
+
+ingress:
+  enabled: false
+  annotations: []
+  host: ""
+  path: ""
+
+configmap:
+  RADIO_FRANCE_API_HOST: "https://openapi.radiofrance.fr/v1/graphql"
+
+secrets:
+  RADIO_FRANCE_API_TOKEN: "radio-france-api-token"
