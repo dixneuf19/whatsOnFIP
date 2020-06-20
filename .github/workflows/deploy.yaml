@@ -28,6 +28,15 @@ jobs:
           skip-cache: false
           qemu-version: latest
 
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        id: cache
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
 
       - name: Available platforms
         run: echo ${{ steps.buildx.outputs.platforms }}
@@ -36,7 +45,10 @@ jobs:
       - name: Run Buildx
         run: |
           docker buildx build \
+            --cache-from "type=local,src=/tmp/.buildx-cache" \
+            --cache-to "type=local,dest=/tmp/.buildx-cache" \
             --platform  "$TARGET_PLATFORMS" \
+            --output "type=image,push=false" \
             -t $DOCKER_REPOSITERY/$IMAGE_NAME:${GITHUB_SHA::7} \
             .
             
@@ -47,10 +59,20 @@ jobs:
       - name: Run Buildx
         run: |
           docker buildx build \
+            --cache-from "type=local,src=/tmp/.buildx-cache" \
             --platform  "$TARGET_PLATFORMS" \
+            --output "type=image,push=true" \
             -t $DOCKER_REPOSITERY/$IMAGE_NAME:${GITHUB_SHA::7} \
-            . \
-            --push
+            .
+      
+      - name: Docker Check Manifest
+        run: |
+          docker run --rm mplatform/mquery $DOCKER_REPOSITERY/$IMAGE_NAME:${GITHUB_SHA::7}
+
+      - name: Clear Docker credentials
+        if: always()
+        run: |
+          rm -f ${HOME}/.docker/config.json
 
   deploy:
     runs-on: ubuntu-20.04
