@@ -1,5 +1,7 @@
 # What's on FIP ?
 
+[![Deploy](https://github.com/dixneuf19/whatsOnFIP/workflows/Deploy/badge.svg)](https://github.com/dixneuf19/whatsOnFIP/actions?query=workflow%3ADeploy)
+
 ## Local development
 
 You can build the *Docker* image with `make build` and then run it with `make run`.
