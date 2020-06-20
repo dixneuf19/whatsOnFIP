@@ -14,7 +14,7 @@ load_dotenv()
 
 API_TOKEN = os.getenv("RADIO_FRANCE_API_TOKEN")
 
-RADIO_FRANCE_API = "https://openapi.radiofrance.fr/v1/graphql"
+RADIO_FRANCE_API = os.getenv("RADIO_FRANCE_API_HOST", "https://openapi.radiofrance.fr/v1/graphql")
 
 
 class LiveUnavailableException(Exception):
