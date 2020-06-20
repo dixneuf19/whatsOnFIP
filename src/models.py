@@ -8,3 +8,7 @@ class Song:
     album: str
     artist: str
     year: int
+
+@dataclass
+class Station:
+    name: str

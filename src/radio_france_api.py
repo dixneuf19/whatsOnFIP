@@ -8,7 +8,7 @@ from gql import gql, Client
 from gql.transport.requests import RequestsHTTPTransport
 from requests.models import HTTPError
 
-from src.models import Song
+from src.models import Song, Station
 
 load_dotenv()
 
@@ -106,3 +106,12 @@ class APIClient(Client):
                 f"invalid result for live {station} query : {res}"
             )
         return track_to_song(res["live"]["song"])
+
+    def execute_stations_enum_query(self) -> List[Station]:
+        logging.info(f"Querying the GraphQL API for all Radio France stations")
+        query = gql('{__type(name: "StationsEnum") {enumValues {name}}}')
+        try:
+            res = super().execute(query)
+            return ([Station(name=station["name"]) for station in res["__type"]["enumValues"]])
+        except:
+            raise
