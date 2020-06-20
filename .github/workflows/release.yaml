@@ -69,7 +69,7 @@ jobs:
 
       # Configure kubectl.
       - name: Configure kubectl
-        run: echo ${{ secrets.KUBE_CONFIG_B64 }} | base64 --decode > kubeconfig.yml
+        run: echo "${{ secrets.KUBE_CONFIG_B64 }}" | base64 --decode > kubeconfig.yml
 
       - uses: azure/setup-helm@v1
         with:
