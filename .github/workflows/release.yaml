@@ -12,50 +12,50 @@ env:
   HELM_RELEASE_NAME: whats-on-fip
 
 jobs:
-  build_and_release:
-    runs-on: ubuntu-20.04
-    steps:
-      # Get the repositery's code
-      - name: Checkout
-        uses: actions/checkout@v2
+  # build_and_release:
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     # Get the repositery's code
+  #     - name: Checkout
+  #       uses: actions/checkout@v2
       
 
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: crazy-max/ghaction-docker-buildx@v2
-        with: # in production, fix the version of your dependencies
-          buildx-version: latest
-          skip-cache: false
-          qemu-version: latest
+  #     - name: Set up Docker Buildx
+  #       id: buildx
+  #       uses: crazy-max/ghaction-docker-buildx@v2
+  #       with: # in production, fix the version of your dependencies
+  #         buildx-version: latest
+  #         skip-cache: false
+  #         qemu-version: latest
 
 
-      - name: Available platforms
-        run: echo ${{ steps.buildx.outputs.platforms }}
+  #     - name: Available platforms
+  #       run: echo ${{ steps.buildx.outputs.platforms }}
       
-      # Build the images
-      - name: Run Buildx
-        run: |
-          docker buildx build \
-            --platform  "$TARGET_PLATFORMS" \
-            -t $DOCKER_REPOSITERY/$IMAGE_NAME:${GITHUB_SHA::7} \
-            .
+  #     # Build the images
+  #     - name: Run Buildx
+  #       run: |
+  #         docker buildx build \
+  #           --platform  "$TARGET_PLATFORMS" \
+  #           -t $DOCKER_REPOSITERY/$IMAGE_NAME:${GITHUB_SHA::7} \
+  #           .
             
-      - name: Login to DockerHub
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "$DOCKER_REPOSITERY" --password-stdin
+  #     - name: Login to DockerHub
+  #       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "$DOCKER_REPOSITERY" --password-stdin
 
-      # Build the images
-      - name: Run Buildx
-        run: |
-          docker buildx build \
-            --platform  "$TARGET_PLATFORMS" \
-            -t $DOCKER_REPOSITERY/$IMAGE_NAME:${GITHUB_SHA::7} \
-            . \
-            --push
+  #     # Build the images
+  #     - name: Run Buildx
+  #       run: |
+  #         docker buildx build \
+  #           --platform  "$TARGET_PLATFORMS" \
+  #           -t $DOCKER_REPOSITERY/$IMAGE_NAME:${GITHUB_SHA::7} \
+  #           . \
+  #           --push
 
   deploy:
     runs-on: ubuntu-20.04
-    needs: 
-      - build_and_release
+    # needs: 
+      # - build_and_release
     steps:
       # Get the repositery's code
       - name: Checkout
@@ -78,4 +78,4 @@ jobs:
       # deploy helm release
       - name: Deploy Helm release
         run : |
-          helm upgrade --kubeconfig kubeconfig.yml --wait -i $HELM_RELEASE_NAME kubernetes/ --set container.image.tag=${GITHUB_SHA::7}
+          helm upgrade --kubeconfig kubeconfig.yml --wait -i $HELM_RELEASE_NAME kubernetes/ --set container.image.tag=060a9e7
