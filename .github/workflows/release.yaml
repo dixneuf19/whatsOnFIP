@@ -1,0 +1,81 @@
+name: release
+
+on:
+  push:
+    branches:
+    - master
+
+env:
+  DOCKER_REPOSITERY: dixneuf19
+  IMAGE_NAME: whatsonfip
+  TARGET_PLATFORMS: linux/amd64,linux/386,linux/arm64,linux/arm/v7
+  HELM_RELEASE_NAME: whats-on-fip
+
+jobs:
+  build_and_release:
+    runs-on: ubuntu-20.04
+    steps:
+      # Get the repositery's code
+      - name: Checkout
+        uses: actions/checkout@v2
+      
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: crazy-max/ghaction-docker-buildx@v2
+        with: # in production, fix the version of your dependencies
+          buildx-version: latest
+          skip-cache: false
+          qemu-version: latest
+
+
+      - name: Available platforms
+        run: echo ${{ steps.buildx.outputs.platforms }}
+      
+      # Build the images
+      - name: Run Buildx
+        run: |
+          docker buildx build \
+            --platform  "$TARGET_PLATFORMS" \
+            -t $DOCKER_REPOSITERY/$IMAGE_NAME:${GITHUB_SHA::7} \
+            .
+            
+      - name: Login to DockerHub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      # Build the images
+      - name: Run Buildx
+        run: |
+          docker buildx build \
+            --platform  "$TARGET_PLATFORMS" \
+            -t $DOCKER_REPOSITERY/$IMAGE_NAME:${GITHUB_SHA::7} \
+            . \
+            --push
+
+  deploy:
+    runs-on: ubuntu-20.04
+    needs: 
+      - build_and_release
+    steps:
+      # Get the repositery's code
+      - name: Checkout
+        uses: actions/checkout@v2
+
+
+      # set up kubectl
+      - uses: azure/setup-kubectl@v1
+        with:
+          version: "v1.18.4" # default is latest stable
+
+      # Configure kubectl.
+      - name: Configure kubectl
+        run: echo ${{ secrets.KUBE_CONFIG_B64 }} | base64 --decode > kubeconfig.yml
+
+      - uses: azure/setup-helm@v1
+        with:
+          version: "v3.2.0" # default is latest stable
+
+      # deploy helm release
+      - name: Deploy Helm release
+        run : |
+          helm upgrade --kubeconfig kubeconfig.yml --wait -i $HELM_RELEASE_NAME kubernetes/ --set container.image.tag=${GITHUB_SHA::7}
