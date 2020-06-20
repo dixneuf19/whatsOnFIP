@@ -3,7 +3,7 @@ name: Deploy
 on:
   push:
     branches:
-    - master
+      - master
 
 env:
   DOCKER_REPOSITERY: dixneuf19
@@ -18,7 +18,6 @@ jobs:
       # Get the repositery's code
       - name: Checkout
         uses: actions/checkout@v2
-      
 
       - name: Set up Docker Buildx
         id: buildx
@@ -37,10 +36,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-
       - name: Available platforms
         run: echo ${{ steps.buildx.outputs.platforms }}
-      
+
       # Build the images
       - name: Run Buildx
         run: |
@@ -51,7 +49,7 @@ jobs:
             --output "type=image,push=false" \
             -t $DOCKER_REPOSITERY/$IMAGE_NAME:${GITHUB_SHA::7} \
             .
-            
+
       - name: Login to DockerHub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "$DOCKER_REPOSITERY" --password-stdin
 
@@ -64,7 +62,7 @@ jobs:
             --output "type=image,push=true" \
             -t $DOCKER_REPOSITERY/$IMAGE_NAME:${GITHUB_SHA::7} \
             .
-      
+
       - name: Docker Check Manifest
         run: |
           docker run --rm mplatform/mquery $DOCKER_REPOSITERY/$IMAGE_NAME:${GITHUB_SHA::7}
@@ -76,13 +74,12 @@ jobs:
 
   deploy:
     runs-on: ubuntu-20.04
-    needs: 
+    needs:
       - build_and_release
     steps:
       # Get the repositery's code
       - name: Checkout
         uses: actions/checkout@v2
-
 
       # set up kubectl
       - uses: azure/setup-kubectl@v1
@@ -99,5 +96,5 @@ jobs:
 
       # deploy helm release
       - name: Deploy Helm release
-        run : |
+        run: |
           helm upgrade --kubeconfig kubeconfig.yml --wait -i $HELM_RELEASE_NAME kubernetes/ --set container.image.tag=${GITHUB_SHA::7}
