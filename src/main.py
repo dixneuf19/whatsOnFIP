@@ -34,3 +34,7 @@ async def get_stations() -> List[Station]:
 @app.get("/health")
 async def get_health():
     return {"message": "OK"}
+
+@app.get("/api-status")
+async def get_api_status():
+    return {"status": api_client.get_api_status()}

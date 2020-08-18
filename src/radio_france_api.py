@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from gql import gql, Client
 from gql.transport.requests import RequestsHTTPTransport
 from requests.models import HTTPError
+from requests import get
 
 from src.models import Song, Station
 
@@ -15,6 +16,7 @@ load_dotenv()
 API_TOKEN = os.getenv("RADIO_FRANCE_API_TOKEN")
 
 RADIO_FRANCE_API = os.getenv("RADIO_FRANCE_API_HOST", "https://openapi.radiofrance.fr/v1/graphql")
+RADIO_FRANCE_API_HEALTHCHECK = os.getenv("RADIO_FRANCE_API_HEALTHCHECK", "https://openapi.radiofrance.fr/v1/.well-known/apollo/server-health")
 
 
 class LiveUnavailableException(Exception):
@@ -46,9 +48,10 @@ class APIClient(Client):
                 use_json=True,
                 headers={"Content-type": "application/json",},
                 verify=True,
+                retries=3,
             )
             super().__init__(
-                retries=3, transport=sample_transport, fetch_schema_from_transport=True,
+                transport=sample_transport, fetch_schema_from_transport=True,
             )
         except HTTPError as e:
             if "403" in str(e):
@@ -115,3 +118,8 @@ class APIClient(Client):
             return ([Station(name=station["name"]) for station in res["__type"]["enumValues"]])
         except:
             raise
+
+    def get_api_status(self) -> int:
+        logging.info(f"Fetching api status")
+        res = get(url=RADIO_FRANCE_API_HEALTHCHECK, params={"x-token": API_TOKEN})
+        return res.status_code

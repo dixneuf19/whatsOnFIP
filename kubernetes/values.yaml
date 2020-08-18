@@ -34,6 +34,7 @@ ingress:
 
 configmap:
   RADIO_FRANCE_API_HOST: "https://openapi.radiofrance.fr/v1/graphql"
+  RADIO_FRANCE_API_HEALTHCHECK: "https://openapi.radiofrance.fr/v1/.well-known/apollo/server-health"
 
 secrets:
   RADIO_FRANCE_API_TOKEN: "radio-france-api-token"
