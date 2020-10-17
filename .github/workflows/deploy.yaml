@@ -6,16 +6,19 @@ on:
       - master
 
 env:
-  DOCKER_REPOSITERY: dixneuf19
-  IMAGE_NAME: whatsonfip
+  DOCKER_REPOSITORY: dixneuf19
+  HELM_REPOSITORY_NAME: dixneuf19
+  HELM_REPOSITORY_URL: https://dixneuf19.github.io/helm-charts-repo/
+  HELM_CHART_NAME: base-helm-chart
   TARGET_PLATFORMS: linux/amd64,linux/386,linux/arm64,linux/arm/v7
   HELM_RELEASE_NAME: whats-on-fip
+  IMAGE_NAME: whatsonfip
 
 jobs:
   build_and_release:
     runs-on: ubuntu-20.04
     steps:
-      # Get the repositery's code
+      # Get the repository's code
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -47,11 +50,11 @@ jobs:
             --cache-to "type=local,dest=/tmp/.buildx-cache" \
             --platform  "$TARGET_PLATFORMS" \
             --output "type=image,push=false" \
-            -t $DOCKER_REPOSITERY/$IMAGE_NAME:${GITHUB_SHA::7} \
+            -t $DOCKER_REPOSITORY/$IMAGE_NAME:${GITHUB_SHA::7} \
             .
 
       - name: Login to DockerHub
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "$DOCKER_REPOSITERY" --password-stdin
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "$DOCKER_REPOSITORY" --password-stdin
 
       # Build the images
       - name: Run Buildx
@@ -60,12 +63,12 @@ jobs:
             --cache-from "type=local,src=/tmp/.buildx-cache" \
             --platform  "$TARGET_PLATFORMS" \
             --output "type=image,push=true" \
-            -t $DOCKER_REPOSITERY/$IMAGE_NAME:${GITHUB_SHA::7} \
+            -t $DOCKER_REPOSITORY/$IMAGE_NAME:${GITHUB_SHA::7} \
             .
 
       - name: Docker Check Manifest
         run: |
-          docker run --rm mplatform/mquery $DOCKER_REPOSITERY/$IMAGE_NAME:${GITHUB_SHA::7}
+          docker run --rm mplatform/mquery $DOCKER_REPOSITORY/$IMAGE_NAME:${GITHUB_SHA::7}
 
       - name: Clear Docker credentials
         if: always()
@@ -77,7 +80,7 @@ jobs:
     needs:
       - build_and_release
     steps:
-      # Get the repositery's code
+      # Get the repository's code
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -94,7 +97,15 @@ jobs:
         with:
           version: "v3.2.0" # default is latest stable
 
+      - name: Add helm repo
+        run: |
+          helm repo add $HELM_REPOSITORY_NAME $HELM_REPOSITORY_URL
+          helm repo update
+
       # deploy helm release
       - name: Deploy Helm release
         run: |
-          helm upgrade --kubeconfig kubeconfig.yml --wait -i $HELM_RELEASE_NAME kubernetes/ --set container.image.tag=${GITHUB_SHA::7}
+          helm upgrade -i --wait --kubeconfig kubeconfig.yml \
+            ${HELM_RELEASE_NAME} ${HELM_REPOSITORY_NAME}/${HELM_CHART_NAME} \
+            -f values.yaml \
+            --set image.repository=${DOCKER_REPOSITORY}/${IMAGE_NAME} --set image.tag=${GITHUB_SHA::7}
