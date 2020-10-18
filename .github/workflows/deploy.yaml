@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - master
+  pull_request:
+    branches:
+      - master
 
 env:
   DOCKER_REPOSITORY: dixneuf19
@@ -77,6 +80,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-20.04
+    if: github.ref == 'refs/heads/master'
     needs:
       - build_and_release
     steps:
