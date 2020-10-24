@@ -122,4 +122,5 @@ class APIClient(Client):
     def get_api_status(self) -> int:
         logging.info(f"Fetching api status")
         res = get(url=RADIO_FRANCE_API_HEALTHCHECK, params={"x-token": API_TOKEN})
+        print(res)
         return res.status_code
