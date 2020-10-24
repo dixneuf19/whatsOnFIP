@@ -3,8 +3,8 @@ FROM python:3.9.0-buster
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
-COPY src src
+COPY whatsonfip whatsonfip
 
 EXPOSE 80
 
-CMD ["uvicorn", "src.main:app" , "--host", "0.0.0.0", "--port", "80"]
+CMD ["uvicorn", "whatsonfip.main:app" , "--host", "0.0.0.0", "--port", "80"]

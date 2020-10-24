@@ -5,8 +5,8 @@ from fastapi import FastAPI, status, Query
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 
-from src.radio_france_api import APIClient, LiveUnavailableException
-from src.models import Song, Station, APIStatus
+from whatsonfip.radio_france_api import APIClient, LiveUnavailableException
+from whatsonfip.models import Song, Station, APIStatus
 
 app = FastAPI()
 api_client = APIClient()

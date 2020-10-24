@@ -9,7 +9,7 @@ from gql.transport.requests import RequestsHTTPTransport
 from requests.models import HTTPError
 from requests import get
 
-from src.models import Song, Station
+from whatsonfip.models import Song, Station
 
 load_dotenv()
 
@@ -122,5 +122,4 @@ class APIClient(Client):
     def get_api_status(self) -> int:
         logging.info(f"Fetching api status")
         res = get(url=RADIO_FRANCE_API_HEALTHCHECK, params={"x-token": API_TOKEN})
-        print(res)
         return res.status_code

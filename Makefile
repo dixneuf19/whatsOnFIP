@@ -7,7 +7,7 @@ DOCKER_IMAGE_PATH=$(DOCKER_REPOSITERY)/$(IMAGE_NAME):$(IMAGE_TAG)
 APP_NAME=whats-on-fip
 
 dev:
-	uvicorn src.main:app --reload
+	uvicorn whatsonfip.main:app --reload
 
 build:
 	docker build -t $(DOCKER_IMAGE_PATH) .
