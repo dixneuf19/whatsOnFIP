@@ -11,20 +11,27 @@ from whatsonfip.models import Song, Station, APIStatus
 app = FastAPI(
     title="What's on FIP ?",
     description="Let's find out what your listening on this eclectic radio!",
-    version="0.1.0"
+    version="0.1.0",
 )
 
 api_client = APIClient()
 
 
 @app.get("/live", response_model=Song)
-async def get_live(station: str = Query("FIP", title="Station Name", description="Short name of the Radio France station")) -> Song:
+async def get_live(
+    station: str = Query(
+        "FIP",
+        title="Station Name",
+        description="Short name of the Radio France station",
+    )
+) -> Song:
     try:
         return api_client.execute_live_query(station)
     except LiveUnavailableException as e:
         logging.warning(e)
         return JSONResponse(
-            content=jsonable_encoder({"message": "No track information"}), status_code=status.HTTP_204_NO_CONTENT
+            content=jsonable_encoder({"message": "No track information"}),
+            status_code=status.HTTP_204_NO_CONTENT,
         )
 
 
@@ -32,13 +39,16 @@ async def get_live(station: str = Query("FIP", title="Station Name", description
 async def get_grid(start: int, end: int, station: str = "FIP") -> List[Song]:
     return api_client.execute_grid_query(start, end, station)
 
+
 @app.get("/stations", response_model=List[Station])
 async def get_stations() -> List[Station]:
     return api_client.execute_stations_enum_query()
 
+
 @app.get("/health")
 async def get_health():
     return {"message": "OK"}
+
 
 @app.get("/api-status", response_model=APIStatus)
 async def get_api_status():

@@ -15,8 +15,13 @@ load_dotenv()
 
 API_TOKEN = os.getenv("RADIO_FRANCE_API_TOKEN")
 
-RADIO_FRANCE_API = os.getenv("RADIO_FRANCE_API_HOST", "https://openapi.radiofrance.fr/v1/graphql")
-RADIO_FRANCE_API_HEALTHCHECK = os.getenv("RADIO_FRANCE_API_HEALTHCHECK", "https://openapi.radiofrance.fr/v1/.well-known/apollo/server-health")
+RADIO_FRANCE_API = os.getenv(
+    "RADIO_FRANCE_API_HOST", "https://openapi.radiofrance.fr/v1/graphql"
+)
+RADIO_FRANCE_API_HEALTHCHECK = os.getenv(
+    "RADIO_FRANCE_API_HEALTHCHECK",
+    "https://openapi.radiofrance.fr/v1/.well-known/apollo/server-health",
+)
 
 
 class LiveUnavailableException(Exception):
@@ -46,12 +51,15 @@ class APIClient(Client):
             sample_transport = RequestsHTTPTransport(
                 url=f"{RADIO_FRANCE_API}?x-token={API_TOKEN}",
                 use_json=True,
-                headers={"Content-type": "application/json",},
+                headers={
+                    "Content-type": "application/json",
+                },
                 verify=True,
                 retries=3,
             )
             super().__init__(
-                transport=sample_transport, fetch_schema_from_transport=True,
+                transport=sample_transport,
+                fetch_schema_from_transport=True,
             )
         except HTTPError as e:
             if "403" in str(e):
@@ -115,7 +123,9 @@ class APIClient(Client):
         query = gql('{__type(name: "StationsEnum") {enumValues {name}}}')
         try:
             res = super().execute(query)
-            return ([Station(name=station["name"]) for station in res["__type"]["enumValues"]])
+            return [
+                Station(name=station["name"]) for station in res["__type"]["enumValues"]
+            ]
         except:
             raise
 
