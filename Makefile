@@ -9,6 +9,9 @@ APP_NAME=whats-on-fip
 dev:
 	uvicorn whatsonfip.main:app --reload
 
+test:
+	PYTHONPATH=. pytest tests
+
 build:
 	docker build -t $(DOCKER_IMAGE_PATH) .
 
