@@ -9,6 +9,12 @@ APP_NAME=whats-on-fip
 dev:
 	uvicorn whatsonfip.main:app --reload
 
+format:
+	black .
+
+check-format:
+	black --check .
+
 test:
 	PYTHONPATH=. pytest tests
 
