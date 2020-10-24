@@ -8,7 +8,12 @@ from fastapi.encoders import jsonable_encoder
 from whatsonfip.radio_france_api import APIClient, LiveUnavailableException
 from whatsonfip.models import Song, Station, APIStatus
 
-app = FastAPI()
+app = FastAPI(
+    title="What's on FIP ?",
+    description="Let's find out what your listening on this eclectic radio!",
+    version="0.1.0"
+)
+
 api_client = APIClient()
 
 
