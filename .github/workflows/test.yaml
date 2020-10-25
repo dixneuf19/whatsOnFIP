@@ -1,0 +1,33 @@
+name: Test
+
+on: [push]
+
+jobs:
+  test:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install black pytest
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Format with black
+      run: |
+        make check-format
+    - name: Test with pytest
+      env:
+        RADIO_FRANCE_API_HOST: https://openapi.radiofrance.fr/v1/graphql
+        RADIO_FRANCE_API_HEALTHCHECK: https://openapi.radiofrance.fr/v1/.well-known/apollo/server-health
+        RADIO_FRANCE_API_TOKEN: ${{ secrets.RADIO_FRANCE_API_TOKEN }}
+      run: |
+        make test
