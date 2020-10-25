@@ -1,4 +1,4 @@
-name: Deploy
+name: Build and release
 
 on:
   push:
@@ -25,59 +25,58 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+        with:
+          platforms: $TARGET_PLATFORMS
+
       - name: Set up Docker Buildx
         id: buildx
-        uses: crazy-max/ghaction-docker-buildx@v2
-        with: # in production, fix the version of your dependencies
-          buildx-version: latest
-          skip-cache: false
-          qemu-version: latest
+        uses: docker/setup-buildx-action@v1
+        with: 
+          buildx-version: latest # in production, fix the version of your dependencies
+
+      - name: Available platforms
+        run: echo ${{ steps.buildx.outputs.platforms }}
 
       - name: Cache Docker layers
         uses: actions/cache@v2
-        id: cache
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      - name: Available platforms
-        run: echo ${{ steps.buildx.outputs.platforms }}
 
       # Build the images
-      - name: Run Buildx
-        run: |
-          docker buildx build \
-            --cache-from "type=local,src=/tmp/.buildx-cache" \
-            --cache-to "type=local,dest=/tmp/.buildx-cache" \
-            --platform  "$TARGET_PLATFORMS" \
-            --output "type=image,push=false" \
-            -t $DOCKER_REPOSITORY/$IMAGE_NAME:${GITHUB_SHA::7} \
-            .
+      - name: Build docker
+        uses: docker/build-push-action@v2
+        with:
+          push: false
+          tags: $DOCKER_REPOSITORY/$IMAGE_NAME:${GITHUB_SHA::7}
+          platforms: $TARGET_PLATFORMS
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
 
+       
+            .
       - name: Login to DockerHub
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "$DOCKER_REPOSITORY" --password-stdin
+        uses: docker/login-action@v1
+        with:
+          username: $DOCKER_REPOSITORY
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # Build the images
-      - name: Run Buildx
-        run: |
-          docker buildx build \
-            --cache-from "type=local,src=/tmp/.buildx-cache" \
-            --platform  "$TARGET_PLATFORMS" \
-            --output "type=image,push=true" \
-            -t $DOCKER_REPOSITORY/$IMAGE_NAME:${GITHUB_SHA::7} \
+
+      # Push the images
+      - name: Push docker images
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: $DOCKER_REPOSITORY/$IMAGE_NAME:${GITHUB_SHA::7}
+          platforms: $TARGET_PLATFORMS
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
             .
-
-      - name: Docker Check Manifest
-        run: |
-          docker run --rm mplatform/mquery $DOCKER_REPOSITORY/$IMAGE_NAME:${GITHUB_SHA::7}
-
-      - name: Clear Docker credentials
-        if: always()
-        run: |
-          rm -f ${HOME}/.docker/config.json
-
   deploy:
     runs-on: ubuntu-20.04
     if: github.ref == 'refs/heads/master'
