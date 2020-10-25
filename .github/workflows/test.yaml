@@ -25,5 +25,9 @@ jobs:
       run: |
         make check-format
     - name: Test with pytest
+      env:
+        RADIO_FRANCE_API_HOST: https://openapi.radiofrance.fr/v1/graphql
+        RADIO_FRANCE_API_HEALTHCHECK: https://openapi.radiofrance.fr/v1/.well-known/apollo/server-health
+        RADIO_FRANCE_API_TOKEN: ${{ secrets.RADIO_FRANCE_API_TOKEN }}
       run: |
         make test
