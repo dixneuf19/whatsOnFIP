@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 
 from whatsonfip.radio_france_api import APIClient, LiveUnavailableException
-from whatsonfip.models import Song, Station, APIStatus
+from whatsonfip.models import Song, Station, APIStatus, Message
 
 app = FastAPI(
     title="What's on FIP ?",
@@ -17,7 +17,17 @@ app = FastAPI(
 api_client = APIClient()
 
 
-@app.get("/live", response_model=Song)
+@app.get(
+    "/live",
+    response_model=Song,
+    responses={
+        201: {
+            "model": Message,
+            "description": "No information available about the current song",
+        },
+        200: {"description": "Current song live"},
+    },
+)
 async def get_live(
     station: str = Query(
         "FIP",
@@ -30,7 +40,11 @@ async def get_live(
     except LiveUnavailableException as e:
         logging.warning(e)
         return JSONResponse(
-            content=jsonable_encoder({"message": "No track information"}),
+            content=jsonable_encoder(
+                {
+                    "message": f"No information available about the current song at {station}"
+                }
+            ),
             status_code=status.HTTP_204_NO_CONTENT,
         )
 

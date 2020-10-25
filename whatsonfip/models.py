@@ -17,3 +17,7 @@ class Station(BaseModel):
 class APIStatus(BaseModel):
     code: int
     message: Optional[str]
+
+
+class Message(BaseModel):
+    message: str
