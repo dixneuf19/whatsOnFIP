@@ -36,7 +36,7 @@ async def get_live(
     )
 ) -> Song:
     try:
-        return api_client.execute_live_query(station)
+        return await api_client.execute_live_query(station)
     except LiveUnavailableException as e:
         logging.warning(e)
         return JSONResponse(
@@ -51,12 +51,12 @@ async def get_live(
 
 @app.get("/grid", response_model=List[Song])
 async def get_grid(start: int, end: int, station: str = "FIP") -> List[Song]:
-    return api_client.execute_grid_query(start, end, station)
+    return await api_client.execute_grid_query(start, end, station)
 
 
 @app.get("/stations", response_model=List[Station])
 async def get_stations() -> List[Station]:
-    return api_client.execute_stations_enum_query()
+    return await api_client.execute_stations_enum_query()
 
 
 @app.get("/health")
@@ -66,4 +66,4 @@ async def get_health():
 
 @app.get("/api-status", response_model=APIStatus)
 async def get_api_status():
-    return {"code": api_client.get_api_status()}
+    return {"code": await api_client.get_api_status()}
