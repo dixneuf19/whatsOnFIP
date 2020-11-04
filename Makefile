@@ -5,6 +5,7 @@ IMAGE_NAME=whatsonfip
 IMAGE_TAG=$(shell git rev-parse --short HEAD)
 DOCKER_IMAGE_PATH=$(DOCKER_REPOSITERY)/$(IMAGE_NAME):$(IMAGE_TAG)
 APP_NAME=whats-on-fip
+KUBE_NAMESPACE=fip
 
 dev:
 	uvicorn whatsonfip.main:app --reload
@@ -41,3 +42,6 @@ deploy:
 
 secret:
 	kubectl create secret generic radio-france-api-token --from-env-file=.env
+
+kube-credentials:
+	NAMESPACE=${KUBE_NAMESPACE} ./scripts/generate-kubeconfig.sh
