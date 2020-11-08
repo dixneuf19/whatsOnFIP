@@ -10,6 +10,9 @@ KUBE_NAMESPACE=fip
 dev:
 	uvicorn whatsonfip.main:app --reload
 
+lint:
+	docker run -e RUN_LOCAL=true -v $(shell pwd):/tmp/lint github/super-linter
+
 format:
 	black .
 
