@@ -21,7 +21,7 @@ UNOFFICIAL_API_OPERATION_NOW = os.getenv(
 
 def get_now_unofficial() -> Song:
     r = requests.get(url=UNOFFICIAL_API_URL + UNOFFICIAL_API_OPERATION_NOW)
-    logger.info(r.json())
+    logger.debug(r.json())
     song = r.json()["data"]["now"]["song"]
 
     song["artist"] = song["interpreters"][0] if len(song["interpreters"]) > 0 else ""
