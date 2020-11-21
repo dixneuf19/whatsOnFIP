@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 from pydantic import BaseModel
 
@@ -7,7 +7,10 @@ class Song(BaseModel):
     title: str
     album: str
     artist: str
-    year: int
+    year: Optional[int]
+    label: Optional[str]
+    musical_kind: Optional[str]
+    external_urls: Dict[str, str] = {}
 
 
 class Station(BaseModel):

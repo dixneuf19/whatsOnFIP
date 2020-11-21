@@ -1,5 +1,9 @@
-import logging
+import os
 from typing import List
+
+from loguru import logger
+
+from dotenv import load_dotenv
 
 from fastapi import FastAPI, status, Query
 from fastapi.responses import JSONResponse
@@ -7,6 +11,12 @@ from fastapi.encoders import jsonable_encoder
 
 from whatsonfip.radio_france_api import APIClient, LiveUnavailableException
 from whatsonfip.models import Song, Station, APIStatus, Message
+from whatsonfip.unofficial_api import get_now_unofficial
+
+load_dotenv()
+
+USE_UNOFFICIAL_API = os.getenv("USE_UNOFFICIAL_API", "true") in ("True", "true", "1")
+
 
 app = FastAPI(
     title="What's on FIP ?",
@@ -35,10 +45,21 @@ async def get_live(
         description="Short name of the Radio France station",
     )
 ) -> Song:
+
+    # Use retro-engineered API if possible
+    if station == "FIP" and USE_UNOFFICIAL_API:
+        try:
+            logger.info("Use unofficial API to fetch current song")
+            song = get_now_unofficial()
+            return song
+        except Exception as e:
+            logger.error(e)
+
+    # Radio France OpenAPI api: less reliable and complete
     try:
         return await api_client.execute_live_query(station)
     except LiveUnavailableException as e:
-        logging.warning(e)
+        logger.warning(e)
         return JSONResponse(
             content=jsonable_encoder(
                 {

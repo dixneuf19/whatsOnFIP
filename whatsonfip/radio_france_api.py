@@ -1,6 +1,7 @@
 import os
-import logging
 from typing import List
+
+from loguru import logger
 
 from dotenv import load_dotenv
 
@@ -29,24 +30,22 @@ class LiveUnavailableException(Exception):
 
 def track_to_song(track) -> Song:
     doc = track["track"]
-    artist = None
+    artist = ""
     try:
         artist = doc["mainArtists"][0]
     except IndexError:
         pass
+    doc["artist"] = artist
+    doc["year"] = doc["productionDate"]
+    doc["album"] = album = doc["albumTitle"]
 
-    return Song(
-        title=doc["title"],
-        album=doc["albumTitle"],
-        artist=artist,
-        year=doc["productionDate"],
-    )
+    return Song(**doc)
 
 
 class APIClient(Client):
     def __init__(self) -> None:
         try:
-            logging.info("Initiating GraphQL API client")
+            logger.info("Initiating GraphQL API client")
             sample_transport = AIOHTTPTransport(
                 url=f"{RADIO_FRANCE_API}?x-token={API_TOKEN}"
             )
@@ -56,7 +55,7 @@ class APIClient(Client):
             )
         except HTTPError as e:
             if "403" in str(e):
-                logging.warning("The API returned 403, check your API token")
+                logger.warning("The API returned 403, check your API token")
             raise
         except:
             raise
@@ -64,7 +63,7 @@ class APIClient(Client):
     async def execute_grid_query(
         self, start: int, end: int, station: str = "FIP"
     ) -> List[Song]:
-        logging.info(f"Querying the GraphQL API for {station} from {start} to {end}")
+        logger.info(f"Querying the GraphQL API for {station} from {start} to {end}")
         query = gql(
             f"""{{ 
                 grid(start: {start}, end: {end}, station: {station}) {{ 
@@ -74,6 +73,7 @@ class APIClient(Client):
                         albumTitle 
                         mainArtists 
                         productionDate
+                        label
                         }}
                     }} 
                 }} 
@@ -87,7 +87,7 @@ class APIClient(Client):
             raise
 
     async def execute_live_query(self, station: str = "FIP") -> Song:
-        logging.info(f"Querying the GraphQL API for {station} from live")
+        logger.info(f"Querying the GraphQL API for {station} from live")
         query = gql(
             f"""{{
                 live(station: {station}) {{
@@ -98,6 +98,7 @@ class APIClient(Client):
                             albumTitle
                             mainArtists
                             productionDate
+                            label
                         }}
                     }}
                 }}
@@ -112,7 +113,7 @@ class APIClient(Client):
         return track_to_song(res["live"]["song"])
 
     async def execute_stations_enum_query(self) -> List[Station]:
-        logging.info(f"Querying the GraphQL API for all Radio France stations")
+        logger.info(f"Querying the GraphQL API for all Radio France stations")
         query = gql('{__type(name: "StationsEnum") {enumValues {name}}}')
         try:
             res = await super().execute_async(query)
@@ -123,6 +124,6 @@ class APIClient(Client):
             raise
 
     async def get_api_status(self) -> int:
-        logging.info(f"Fetching api status")
+        logger.info(f"Fetching api status")
         res = get(url=RADIO_FRANCE_API_HEALTHCHECK, params={"x-token": API_TOKEN})
         return res.status_code
