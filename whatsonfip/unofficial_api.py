@@ -30,5 +30,8 @@ def get_now_unofficial() -> Track:
     for key, value in song["external_links"].items():
         if not (key.startswith("__") or value is None):
             song["external_urls"][key] = value["link"]
+    
+    # Special case uncountered once : album is none
+    song["album"] = "" if song["album"] == None else song["album"]
 
     return Track(**song)
