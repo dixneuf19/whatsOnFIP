@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 import requests
 
-from whatsonfip.models import Song, Station
+from whatsonfip.models import Track, Station
 
 load_dotenv()
 
@@ -19,7 +19,7 @@ UNOFFICIAL_API_OPERATION_NOW = os.getenv(
 )
 
 
-def get_now_unofficial() -> Song:
+def get_now_unofficial() -> Track:
     r = requests.get(url=UNOFFICIAL_API_URL + UNOFFICIAL_API_OPERATION_NOW)
     logger.debug(r.json())
     song = r.json()["data"]["now"]["song"]
@@ -31,4 +31,4 @@ def get_now_unofficial() -> Song:
         if not (key.startswith("__") or value is None):
             song["external_urls"][key] = value["link"]
 
-    return Song(**song)
+    return Track(**song)

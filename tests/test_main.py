@@ -1,16 +1,16 @@
 from fastapi.testclient import TestClient
 
 from whatsonfip.main import app
-from whatsonfip.models import Song, Station
+from whatsonfip.models import Track, Station
 
 client = TestClient(app)
 
 
 def test_get_live():
     response = client.get("/live")
-    assert response.status_code in (200, 204)
+    assert response.status_code in (200, 219)
     if response.status_code == 200:
-        assert Song(**response.json())
+        assert Track(**response.json())
 
 
 def test_get_stations():

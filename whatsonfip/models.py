@@ -3,7 +3,7 @@ from typing import List, Optional, Dict
 from pydantic import BaseModel
 
 
-class Song(BaseModel):
+class Track(BaseModel):
     title: str
     album: str
     artist: str

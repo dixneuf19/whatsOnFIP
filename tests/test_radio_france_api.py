@@ -2,7 +2,7 @@ import pytest
 from fastapi.encoders import jsonable_encoder
 
 from whatsonfip.radio_france_api import APIClient, LiveUnavailableException
-from whatsonfip.models import Station, Song
+from whatsonfip.models import Station, Track
 
 radio_france_stations = [
     "FRANCEINTER",
@@ -139,7 +139,7 @@ FIP_songs_2020_05_20_11h_12h_UTC = [
         "year": 2010,
         "musical_kind": None,
         "external_urls": {},
-        "label": None,
+        "label": "CELESTONE",
     },
     {
         "title": "Too young to be one",
@@ -229,7 +229,7 @@ FIP_songs_2020_05_20_11h_12h_UTC = [
         "year": 1971,
         "musical_kind": None,
         "external_urls": {},
-        "label": "POLYDOR",
+        "label": "CBS",
     },
     {
         "title": "Cassidy",
@@ -257,7 +257,7 @@ async def test_execute_live_query():
         response = await client.execute_live_query("FIP")
     except LiveUnavailableException as e:
         return
-    assert Song(**response.dict())
+    assert Track(**response.dict())
 
 
 @pytest.mark.asyncio
