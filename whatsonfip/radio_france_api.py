@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Dict, Any
 
 from loguru import logger
 
@@ -9,7 +9,7 @@ from gql import gql, Client, AIOHTTPTransport
 from requests.models import HTTPError
 from requests import get
 
-from whatsonfip.models import Song, Station
+from whatsonfip.models import Track, Station
 
 load_dotenv()
 
@@ -28,8 +28,8 @@ class LiveUnavailableException(Exception):
     pass
 
 
-def track_to_song(track) -> Song:
-    doc = track["track"]
+def convert_to_track(track_dict: Dict[str, Any]) -> Track:
+    doc = track_dict["track"]
     artist = ""
     try:
         artist = doc["mainArtists"][0]
@@ -39,7 +39,7 @@ def track_to_song(track) -> Song:
     doc["year"] = doc["productionDate"]
     doc["album"] = album = doc["albumTitle"]
 
-    return Song(**doc)
+    return Track(**doc)
 
 
 class APIClient(Client):
@@ -62,7 +62,7 @@ class APIClient(Client):
 
     async def execute_grid_query(
         self, start: int, end: int, station: str = "FIP"
-    ) -> List[Song]:
+    ) -> List[Track]:
         logger.info(f"Querying the GraphQL API for {station} from {start} to {end}")
         query = gql(
             f"""{{ 
@@ -82,11 +82,11 @@ class APIClient(Client):
         )
         try:
             tracks = await super().execute_async(query)
-            return [track_to_song(t) for t in tracks["grid"]]
+            return [convert_to_track(t) for t in tracks["grid"]]
         except:
             raise
 
-    async def execute_live_query(self, station: str = "FIP") -> Song:
+    async def execute_live_query(self, station: str = "FIP") -> Track:
         logger.info(f"Querying the GraphQL API for {station} from live")
         query = gql(
             f"""{{
@@ -110,7 +110,7 @@ class APIClient(Client):
             raise LiveUnavailableException(
                 f"invalid result for live {station} query : {res}"
             )
-        return track_to_song(res["live"]["song"])
+        return convert_to_track(res["live"]["song"])
 
     async def execute_stations_enum_query(self) -> List[Station]:
         logger.info(f"Querying the GraphQL API for all Radio France stations")
