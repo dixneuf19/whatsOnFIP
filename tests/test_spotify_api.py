@@ -120,7 +120,16 @@ def test_add_spotify_external_url_unknow(mocker):
 
 def test_add_spotify_external_url_already_existing(mocker):
     mocker.patch("requests.get", new=mock_get_request_on_spotify_api)
-    input_track = Track(**simple_queries_responses["logical song supertramp"])
-    input_track.external_urls = {"spotify": "A random link already there"}
+    input_track = Track(
+        title="logical song",
+        album="Breakfeast in America",
+        artist="supertramp",
+        external_urls={"spotify": "A random link already there"},
+    )
 
-    assert add_spotify_external_url(input_track) == input_track
+    output_track = input_track.copy(deep=True)
+    output_track.external_urls = simple_queries_responses["logical song supertramp"][
+        "external_urls"
+    ]
+
+    assert add_spotify_external_url(input_track) == output_track

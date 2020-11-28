@@ -39,7 +39,6 @@ def get_spotify_track(input_track: Track) -> Track:
         # Try with a shorted query
         query = f"{' '.join(input_track.title.split()[:2])} {' '.join(input_track.artist.split()[:2])}"
         spotifyTrack = search_on_spotify(query)
-
     return spotifyTrack
 
 
@@ -48,6 +47,7 @@ def add_spotify_external_url(input_track: Track) -> Track:
     try:
         spotifyTrack = get_spotify_track(input_track)
         if "spotify" in spotifyTrack.external_urls:
+            logger.info("Adding a spotify url to track")
             external_urls["spotify"] = spotifyTrack.external_urls["spotify"]
     except SpotifyTrackNotFound:
         # already logged previously

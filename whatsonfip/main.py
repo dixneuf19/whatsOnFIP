@@ -57,23 +57,25 @@ async def get_live(
         except Exception as e:
             logger.warning("Error while using unofficial API: " + str(e))
 
-    # Radio France OpenAPI api: less reliable and complete
-    try:
-        track = await api_client.execute_live_query(station)
-    except LiveUnavailableException as e:
-        logger.warning(e)
-        return JSONResponse(
-            content=jsonable_encoder(
-                {
-                    "message": f"No information available about the current track at {station}"
-                }
-            ),
-            status_code=219,
-        )
+    if track is None:
+        # Radio France OpenAPI api: less reliable and complete
+        try:
+            track = await api_client.execute_live_query(station)
+        except LiveUnavailableException as e:
+            logger.warning(e)
+            return JSONResponse(
+                content=jsonable_encoder(
+                    {
+                        "message": f"No information available about the current track at {station}"
+                    }
+                ),
+                status_code=219,
+            )
 
     # Add spotify external_url if necessary
     try:
         if not ("spotify" in track.external_urls):
+            logger.info("Looking for the track on spotify")
             track = add_spotify_external_url(track)
     except Exception as e:
         logger.warning("Error while using spotify API: " + str(e))
