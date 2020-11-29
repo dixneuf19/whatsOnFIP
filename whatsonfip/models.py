@@ -11,6 +11,7 @@ class Track(BaseModel):
     label: Optional[str]
     musical_kind: Optional[str]
     external_urls: Dict[str, str] = {}
+    cover_url: Optional[str]
 
 
 class Station(BaseModel):
