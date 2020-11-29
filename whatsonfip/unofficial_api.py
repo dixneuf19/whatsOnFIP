@@ -21,10 +21,12 @@ UNOFFICIAL_API_OPERATION_NOW = os.getenv(
 
 def get_now_unofficial() -> Track:
     r = requests.get(url=UNOFFICIAL_API_URL + UNOFFICIAL_API_OPERATION_NOW)
-    logger.debug(r.json())
     song = r.json()["data"]["now"]["song"]
+    logger.debug(song)
 
     song["artist"] = song["interpreters"][0] if len(song["interpreters"]) > 0 else ""
+
+    song["cover_url"] = song["cover"]
 
     song["external_urls"] = {}
     for key, value in song["external_links"].items():

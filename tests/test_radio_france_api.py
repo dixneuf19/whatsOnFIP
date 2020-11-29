@@ -95,6 +95,7 @@ FIP_songs_2020_05_20_11h_12h_UTC = [
         "musical_kind": None,
         "external_urls": {},
         "label": "BLUE NOTE",
+        "cover_url": None,
     },
     {
         "title": "Distant land",
@@ -104,6 +105,7 @@ FIP_songs_2020_05_20_11h_12h_UTC = [
         "musical_kind": None,
         "external_urls": {},
         "label": "BLUE NOTE",
+        "cover_url": None,
     },
     {
         "title": "The world is yours",
@@ -113,6 +115,7 @@ FIP_songs_2020_05_20_11h_12h_UTC = [
         "musical_kind": None,
         "external_urls": {},
         "label": "COLUMBIA",
+        "cover_url": None,
     },
     {
         "title": "Build a nest (feat. Ruby Parker)",
@@ -122,6 +125,7 @@ FIP_songs_2020_05_20_11h_12h_UTC = [
         "musical_kind": None,
         "external_urls": {},
         "label": "INTERNATIONAL ANTHEM",
+        "cover_url": None,
     },
     {
         "title": "Jeux d'eaux",
@@ -131,6 +135,7 @@ FIP_songs_2020_05_20_11h_12h_UTC = [
         "musical_kind": None,
         "external_urls": {},
         "label": "MDG",
+        "cover_url": None,
     },
     {
         "title": "Les deux hérons",
@@ -140,6 +145,7 @@ FIP_songs_2020_05_20_11h_12h_UTC = [
         "musical_kind": None,
         "external_urls": {},
         "label": "CELESTONE",
+        "cover_url": None,
     },
     {
         "title": "Too young to be one",
@@ -149,6 +155,7 @@ FIP_songs_2020_05_20_11h_12h_UTC = [
         "musical_kind": None,
         "external_urls": {},
         "label": "MUSIC CLUB",
+        "cover_url": None,
     },
     {
         "title": "Swlabr",
@@ -158,6 +165,7 @@ FIP_songs_2020_05_20_11h_12h_UTC = [
         "musical_kind": None,
         "external_urls": {},
         "label": "POLYDOR",
+        "cover_url": None,
     },
     {
         "title": "Humpin",
@@ -167,6 +175,7 @@ FIP_songs_2020_05_20_11h_12h_UTC = [
         "musical_kind": None,
         "external_urls": {},
         "label": "STAX",
+        "cover_url": None,
     },
     {
         "title": "Say it loud - I'm black and i'm proud",
@@ -176,6 +185,7 @@ FIP_songs_2020_05_20_11h_12h_UTC = [
         "musical_kind": None,
         "external_urls": {},
         "label": "POLYDOR",
+        "cover_url": None,
     },
     {
         "title": "Bruce Lee",
@@ -185,6 +195,7 @@ FIP_songs_2020_05_20_11h_12h_UTC = [
         "musical_kind": None,
         "external_urls": {},
         "label": "TRICATEL",
+        "cover_url": None,
     },
     {
         "title": "Stoney street",
@@ -194,6 +205,7 @@ FIP_songs_2020_05_20_11h_12h_UTC = [
         "musical_kind": None,
         "external_urls": {},
         "label": "NINJA TUNE",
+        "cover_url": None,
     },
     {
         "title": "Hungboo",
@@ -203,6 +215,7 @@ FIP_songs_2020_05_20_11h_12h_UTC = [
         "musical_kind": None,
         "external_urls": {},
         "label": "NOVA RECORDS/WAGRAM",
+        "cover_url": None,
     },
     {
         "title": "Butterfly san",
@@ -212,6 +225,7 @@ FIP_songs_2020_05_20_11h_12h_UTC = [
         "musical_kind": None,
         "external_urls": {},
         "label": "VICTOR",
+        "cover_url": None,
     },
     {
         "title": "Girl from Mill Valley",
@@ -221,6 +235,7 @@ FIP_songs_2020_05_20_11h_12h_UTC = [
         "musical_kind": None,
         "external_urls": {},
         "label": "EMI",
+        "cover_url": None,
     },
     {
         "title": "Wild horses",
@@ -230,6 +245,7 @@ FIP_songs_2020_05_20_11h_12h_UTC = [
         "musical_kind": None,
         "external_urls": {},
         "label": "CBS",
+        "cover_url": None,
     },
     {
         "title": "Cassidy",
@@ -239,6 +255,7 @@ FIP_songs_2020_05_20_11h_12h_UTC = [
         "musical_kind": None,
         "external_urls": {},
         "label": "LABEL INCONNU",
+        "cover_url": None,
     },
 ]
 
